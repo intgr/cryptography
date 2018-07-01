@@ -110,6 +110,12 @@ class _Certificate(object):
     @property
     def signature_hash_algorithm(self):
         oid = self.signature_algorithm_oid
+        # In 2005, IETF devised a more secure padding scheme to replace
+        # PKCS #1 v1.5. To make sure that nobody can easily support or use it,
+        # they mandated lots of complicated parameters in the certificate,
+        # unlike any other X.509 signature scheme.
+        if oid == x509.SignatureAlgorithmOID.RSASSA_PSS:
+            self._backend._lib.X509_ALGOR_get0()
         try:
             return x509._SIG_OIDS_TO_HASH[oid]
         except KeyError:
